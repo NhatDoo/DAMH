@@ -1,0 +1,42 @@
+Tiêu chí 'Mạng lưới quan hệ' so với 'Xu hướng thị trường' có giá trị so sánh 1.2.
+Tiêu chí 'Mạng lưới quan hệ' so với 'Thời gian' có giá trị so sánh 0.75.
+Tiêu chí 'Mạng lưới quan hệ' so với 'Khu vực' có giá trị so sánh 0.86.
+Tiêu chí 'Mạng lưới quan hệ' so với 'Rủi ro' có giá trị so sánh 0.75.
+Tiêu chí 'Thời gian' so với 'Khu vực' có giá trị so sánh 1.14.
+Tiêu chí 'Thời gian' so với 'Rủi ro' có giá trị so sánh 0.99.
+Tiêu chí 'Thời gian' so với 'Xu hướng thị trường' có giá trị so sánh 1.6.
+Tiêu chí 'Xu hướng thị trường' so với 'Khu vực' có giá trị so sánh 0.71.
+Tiêu chí 'Xu hướng thị trường' so với 'Rủi ro' có giá trị so sánh 0.62.
+Tiêu chí 'Rủi ro' so với 'Khu vực' có giá trị so sánh 1.14.
+Tiêu chí 'Nguồn Vốn' so với 'Khu vực' có giá trị so sánh 0.99.
+Tiêu chí 'Nguồn Vốn' so với 'Rủi ro' có giá trị so sánh 0.88.
+Tiêu chí 'Nguồn Vốn' so với 'Mạng lưới quan hệ' có giá trị so sánh 1.17.
+Tiêu chí 'Nguồn Vốn' so với 'Thời gian' có giá trị so sánh 0.88.
+Tiêu chí 'Nguồn Vốn' so với 'Kỹ năng' có giá trị so sánh 1.4.
+Tiêu chí 'Nguồn Vốn' so với 'Xu hướng thị trường' có giá trị so sánh 1.4.
+Tiêu chí 'Kỹ năng' so với 'Rủi ro' có giá trị so sánh 0.62.
+Tiêu chí 'Kỹ năng' so với 'Khu vực' có giá trị so sánh 0.71.
+Tiêu chí 'Kỹ năng' so với 'Thời gian' có giá trị so sánh 0.62.
+Tiêu chí 'Kỹ năng' so với 'Mạng lưới quan hệ' có giá trị so sánh 0.83.
+Tiêu chí 'Kỹ năng' so với 'Xu hướng thị trường' có giá trị so sánh 0.99.
+Phương án 'Đầu tư bất động sản' so với 'Đầu tư Giáo dục' có giá trị so sánh 1.0.
+Phương án 'Đầu tư bất động sản' so với 'Đầu tư vào buôn bán linh kiện điện tử' có giá trị so sánh 3.0.
+Phương án 'Đầu tư bất động sản' so với 'Đầu tư vào thời trang' có giá trị so sánh 1.0.
+Phương án 'Đầu tư bất động sản' so với 'Đầu tư vào FnB' có giá trị so sánh 2.0.
+Phương án 'Đầu tư bất động sản' so với 'đầu tư vào nông nghiệp' có giá trị so sánh 1.0.
+Phương án 'đầu tư vào nông nghiệp' so với 'Đầu tư Giáo dục' có giá trị so sánh 0.5.
+Phương án 'đầu tư vào nông nghiệp' so với 'Đầu tư vào buôn bán linh kiện điện tử' có giá trị so sánh 1.0.
+Phương án 'đầu tư vào nông nghiệp' so với 'Đầu tư vào thời trang' có giá trị so sánh 1.0.
+Phương án 'đầu tư vào nông nghiệp' so với 'Đầu tư vào FnB' có giá trị so sánh 1.0.
+Phương án 'Đầu tư vào FnB' so với 'Đầu tư Giáo dục' có giá trị so sánh 1.0.
+Phương án 'Đầu tư vào FnB' so với 'Đầu tư vào buôn bán linh kiện điện tử' có giá trị so sánh 1.0.
+Phương án 'Đầu tư vào FnB' so với 'Đầu tư vào thời trang' có giá trị so sánh 1.0.
+Phương án 'Đầu tư vào thời trang' so với 'Đầu tư Giáo dục' có giá trị so sánh 1.0.
+Phương án 'Đầu tư vào thời trang' so với 'Đầu tư vào buôn bán linh kiện điện tử' có giá trị so sánh 1.0.
+Phương án 'Đầu tư vào buôn bán linh kiện điện tử' so với 'Đầu tư Giáo dục' có giá trị so sánh 1.0.
+Phương án 'Đầu tư bất động sản' có thứ hạng 1.0 với điểm số 0.22649213813006916.
+Phương án 'Đầu tư Giáo dục' có thứ hạng 2.0 với điểm số 0.18482547146340247.
+Phương án 'Đầu tư vào thời trang' có thứ hạng 3.0 với điểm số 0.1610159476538787.
+Phương án 'đầu tư vào nông nghiệp' có thứ hạng 4.0 với điểm số 0.14586443250236356.
+Phương án 'Đầu tư vào FnB' có thứ hạng 5.0 với điểm số 0.14377456834353386.
+Phương án 'Đầu tư vào buôn bán linh kiện điện tử' có thứ hạng 6.0 với điểm số 0.13802744190675223.

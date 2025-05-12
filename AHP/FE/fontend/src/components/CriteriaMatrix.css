@@ -1,0 +1,34 @@
+.criteria-only-matrix {
+    margin: 20px 0;
+  }
+  
+  .criteria-only-matrix table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .criteria-only-matrix th,
+  .criteria-only-matrix td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .criteria-only-matrix th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .criteria-only-matrix td.score-cell {
+    cursor: pointer;
+  }
+  
+  .criteria-only-matrix td.score-cell:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .criteria-only-matrix input {
+    width: 60px;
+    padding: 4px;
+    text-align: center;
+  }

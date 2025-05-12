@@ -1,0 +1,129 @@
+/* AuthPage.css */
+
+/* Container for the login/register page */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f7fafc;
+  }
+  
+  /* Card for the form */
+  .auth-card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  /* Tabs for switching between login and register */
+  .auth-tabs {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .auth-tab {
+    flex: 1;
+    padding: 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    color: #4a5568;
+    transition: all 0.3s;
+  }
+  
+  .auth-tab.active {
+    color: #3b82f6;
+    border-bottom: 2px solid #3b82f6;
+  }
+  
+  .auth-tab:hover {
+    color: #3b82f6;
+  }
+  
+  /* Form styles */
+  .auth-form {
+    margin-top: 1rem;
+  }
+  
+  .auth-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+  }
+  
+  .auth-form input[type="email"],
+  .auth-form input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.25rem;
+    transition: border-color 0.3s;
+  }
+  
+  .auth-form input[type="email"]:focus,
+  .auth-form input[type="password"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+  
+  .auth-form .checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .auth-form .checkbox-container input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+  
+  .auth-form .submit-button {
+    width: 100%;
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .auth-form .submit-button:hover {
+    background-color: #2563eb;
+  }
+  
+  /* Error and success messages */
+  .auth-error {
+    background-color: #fee2e2;
+    color: #dc2626;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .auth-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Forgot password link */
+  .forgot-password {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .forgot-password a {
+    color: #3b82f6;
+    text-decoration: none;
+    transition: text-decoration 0.3s;
+  }
+  
+  .forgot-password a:hover {
+    text-decoration: underline;
+  }
