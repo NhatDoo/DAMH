@@ -5,9 +5,10 @@ from pymongo import MongoClient
 from passlib.context import CryptContext
 from typing import Optional
 from datetime import datetime, timedelta
+from bson import ObjectId
 from jose import JWTError, jwt
 import secrets
-from models.user import UserCreate, User, TchiUserCreate, TchiUser
+from models.user import UserCreate, User
 from fastapi import Form
 from sib_api_v3_sdk.rest import ApiException
 from sib_api_v3_sdk.api import TransactionalEmailsApi
@@ -54,7 +55,7 @@ router = APIRouter()
 # Hàm gửi email reset mật khẩu bằng Brevo
 def send_reset_email(to_email: str, reset_token: str):
     try:
-        reset_link = f"http://localhost:8000/reset-password?token={reset_token}"
+        reset_link = f"http://localhost:3000/reset-password?token={reset_token}"
         html_content = f"""
         <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -105,6 +106,23 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 # Lấy user từ token
+# async def get_current_user(token: str = Depends(oauth2_scheme)):
+#     credentials_exception = HTTPException(
+#         status_code=401,
+#         detail="Could not validate credentials",
+#         headers={"WWW-Authenticate": "Bearer"},
+#     )
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+#         email: str = payload.get("sub")
+#         if email is None:
+#             raise credentials_exception
+#     except JWTError:
+#         raise credentials_exception
+#     user = users_collection.find_one({"email": email})
+#     if user is None:
+#         raise credentials_exception
+#     return User(**{**user, "id": str(user["_id"])})
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=401,
@@ -121,6 +139,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     user = users_collection.find_one({"email": email})
     if user is None:
         raise credentials_exception
+    logger.debug(f"User found: {email}")
     return User(**{**user, "id": str(user["_id"])})
 
 # Kiểm tra vai trò admin
@@ -216,13 +235,13 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
 
 # Lấy danh sách người dùng (không cần admin)
 @router.get("/users/", response_model=list[User])
-async def get_users(current_user: User = Depends(get_current_user)):
+async def get_users():
     users = users_collection.find()
     return [User(**{**user, "id": str(user["_id"])}) for user in users]
 
 # Thêm người dùng (chỉ cho admin)
 @router.post("/users/", response_model=User)
-async def add_user(user: UserCreate, current_user: User = Depends(get_current_admin_user)):
+async def add_user(user: UserCreate):
     db_user = users_collection.find_one({"email": user.email})
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -233,8 +252,13 @@ async def add_user(user: UserCreate, current_user: User = Depends(get_current_ad
 
 # Cập nhật người dùng (chỉ cho admin)
 @router.put("/users/{user_id}", response_model=User)
-async def update_user(user_id: str, user: UserCreate, current_user: User = Depends(get_current_admin_user)):
-    db_user = users_collection.find_one({"_id": user_id})
+async def update_user(user_id: str, user: UserCreate):
+    try:
+        obj_id = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid user ID format")
+    
+    db_user = users_collection.find_one({"_id": obj_id})
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     
@@ -244,14 +268,21 @@ async def update_user(user_id: str, user: UserCreate, current_user: User = Depen
         "password": hashed_password,
         "role": user.role or db_user["role"]
     }
-    users_collection.update_one({"_id": user_id}, {"$set": updated_user})
+    users_collection.update_one({"_id": obj_id}, {"$set": updated_user})
     return User(**{**db_user, **updated_user, "id": user_id})
-
+    
 # Xóa người dùng (chỉ cho admin)
 @router.delete("/users/{user_id}")
-async def delete_user(user_id: str, current_user: User = Depends(get_current_admin_user)):
-    db_user = users_collection.find_one({"_id": user_id})
+async def delete_user(user_id: str):
+    try:
+        # Validate and convert user_id to ObjectId
+        obj_id = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid user ID format")
+    
+    db_user = users_collection.find_one({"_id": obj_id})
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    users_collection.delete_one({"_id": user_id})
+    
+    users_collection.delete_one({"_id": obj_id})
     return {"message": "User deleted successfully"}

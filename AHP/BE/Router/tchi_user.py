@@ -1,7 +1,12 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List, Dict
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
+from typing import List, Dict , Optional
 from bson import ObjectId
 from datetime import datetime
+from Router.user import get_current_user
+import io
+import pandas as pd
+from models.user import User
+import json
 from models.tchi_user import TchiUserInput, TchiUserOutput
 from models.ahp_results import UpdateScoresInput
 from pymongo import MongoClient
@@ -19,10 +24,10 @@ logger = logging.getLogger(__name__)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  
 
 # Hàm giả lập để lấy gmail từ token (thay bằng logic xác thực thực tế)
-async def get_current_user_gmail(token: str = Depends(oauth2_scheme)) -> str:
-    # TODO: Triển khai logic giải mã JWT để lấy gmail
-    # Ví dụ: Giả lập trả về gmail
-    return "user@example.com"  # Thay bằng logic thực tế, ví dụ: decode_jwt(token)["email"]
+# async def get_current_user_gmail(token: str = Depends(oauth2_scheme)) -> str:
+#     # TODO: Triển khai logic giải mã JWT để lấy gmail
+#     # Ví dụ: Giả lập trả về gmail
+#     return "user@example.com"  # Thay bằng logic thực tế, ví dụ: decode_jwt(token)["email"]
 
 def get_tchi_user_collection():
     client = MongoClient("mongodb://localhost:27017/")
@@ -108,61 +113,336 @@ def flatten_matrix(matrix: List[List[float]]) -> List[float]:
     return [val for row in matrix for val in row]
 
 # Endpoint POST /tchi_user
+# @router.post("/tchi_user", response_model=TchiUserOutput)
+# async def add_to_tchi_user(data: TchiUserInput):
+#     try:
+#         # Kiểm tra gmail khớp với người dùng đăng nhập
+#         collection, client = get_tchi_user_collection()
+        
+#         # Lấy danh sách tiêu chí từ criterion_scores
+#         criteria_list = list(data.criterion_scores.keys())
+#         if not criteria_list:
+#             raise HTTPException(status_code=400, detail="Danh sách tiêu chí không được rỗng.")
+        
+#         # Tính ma trận so sánh từ criterion_scores
+#         scores = list(data.criterion_scores.values())
+#         comparison_matrix = calculate_comparison_matrix(scores)
+        
+#         # Chuyển ma trận 2D thành mảng phẳng
+#         flat_comparison_matrix = flatten_matrix(data.comparison_matrix)
+        
+#         # Tính trọng số từ ma trận
+#         weights = calculate_weights(flat_comparison_matrix)
+        
+#         # Tính final_score
+#         final_score = calculate_final_score(weights, data.criterion_scores, criteria_list)
+
+#         document = {
+#             "alternative": data.alternative,
+#             "final_score": final_score,
+#             "criterion_scores": data.criterion_scores,
+#             "criteria_list": criteria_list,  # Ensure included
+#             "criteria_comparison_matrix": flat_comparison_matrix,
+#             "consistency_ratio": 0.00,  # Hardcoded as per TchiUserOutput
+#             "created_at": datetime.utcnow().isoformat(),
+#             "updated_at": None,
+           
+#         }
+#         result = collection.insert_one(document)
+#         document["id"] = str(result.inserted_id)
+#         client.close()
+#         return TchiUserOutput(**document)
+#     except Exception as e:
+#         client.close()
+#         logger.error(f"Lỗi trong add_to_tchi_user: {str(e)}")
+#         raise HTTPException(status_code=500, detail=f"Lỗi khi lưu vào MongoDB: {str(e)}")
+
+
+
+# @router.post("/tchi_user", response_model=TchiUserOutput)
+# async def add_to_tchi_user(data: TchiUserInput):
+#     collection = None
+#     client = None
+#     try:
+#         collection, client = get_tchi_user_collection()
+        
+#         # Lấy danh sách tiêu chí từ criteria_list hoặc criterion_scores
+#         criteria_list = data.criteria_list or list(data.criterion_scores.keys())
+#         if not criteria_list:
+#             raise HTTPException(status_code=400, detail="Danh sách tiêu chí không được rỗng.")
+        
+#         # Tính ma trận so sánh từ criterion_scores nếu không có comparison_matrix
+#         scores = list(data.criterion_scores.values())
+#         generated_matrix = calculate_comparison_matrix(scores)
+        
+#         # Xử lý comparison_matrix
+#         expected_size = len(criteria_list) * len(criteria_list)
+#         if data.comparison_matrix:
+#             flat_comparison_matrix = flatten_matrix(data.comparison_matrix)
+#             if len(flat_comparison_matrix) != expected_size:
+#                 logger.warning(f"Ma trận so sánh không hợp lệ (kích thước {len(flat_comparison_matrix)} != {expected_size}), sử dụng ma trận được tạo")
+#                 flat_comparison_matrix = flatten_matrix(generated_matrix)
+#         else:
+#             logger.info("Không có comparison_matrix, sử dụng ma trận được tạo từ criterion_scores")
+#             flat_comparison_matrix = flatten_matrix(generated_matrix)
+        
+#         # Kiểm tra giá trị trong flat_comparison_matrix
+#         if not all(isinstance(val, (int, float)) and 0.111 <= val <= 9 for val in flat_comparison_matrix):
+#             raise HTTPException(status_code=400, detail="Giá trị ma trận phải từ 0.111 đến 9")
+
+#         # Tính trọng số
+#         weights = calculate_weights(flat_comparison_matrix)
+        
+#         # Tính final_score
+#         final_score = calculate_final_score(weights, data.criterion_scores, criteria_list)
+
+#         # Tính consistency_ratio (nếu cần)
+#         consistency_ratio = data.consistency_ratio or 0.0
+
+#         document = {
+#             "alternative": data.alternative,
+#             "final_score": final_score,
+#             # "criterion_scores": data.criterion_scores,
+#             "criteria_list": criteria_list,
+#             "criteria_comparison_matrix": flat_comparison_matrix,
+#             "consistency_ratio": consistency_ratio,
+#             "created_at": datetime.utcnow().isoformat(),
+#             "updated_at": None,
+#         }
+#         result = collection.insert_one(document)
+#         document["id"] = str(result.inserted_id)
+#         return TchiUserOutput(**document)
+#     except Exception as e:
+#         logger.error(f"Lỗi trong add_to_tchi_user: {str(e)}")
+#         raise HTTPException(status_code=500, detail=f"Lỗi khi lưu vào MongoDB: {str(e)}")
+#     finally:
+#         if client:
+#             client.close()
+
+# @router.post("/tchi_user", response_model=TchiUserOutput)
+# async def add_to_tchi_user(data: TchiUserInput, current_user: User = Depends(get_current_user)):
+#     collection = None
+#     client = None
+#     try:
+#         # Giả sử get_tchi_user_collection trả về collection và client
+#         collection, client = get_tchi_user_collection()
+        
+#         # Lấy danh sách tiêu chí từ criteria_list hoặc criterion_scores
+#         criteria_list = data.criteria_list or list(data.criterion_scores.keys())
+#         if not criteria_list:
+#             raise HTTPException(status_code=400, detail="Danh sách tiêu chí không được rỗng.")
+        
+#         # Tính ma trận so sánh từ criterion_scores nếu không có comparison_matrix
+#         scores = list(data.criterion_scores.values())
+#         generated_matrix = calculate_comparison_matrix(scores)
+        
+#         # Xử lý comparison_matrix
+#         expected_size = len(criteria_list) * len(criteria_list)
+#         if data.comparison_matrix:
+#             flat_comparison_matrix = flatten_matrix(data.comparison_matrix)
+#             if len(flat_comparison_matrix) != expected_size:
+#                 logger.warning(f"Ma trận so sánh không hợp lệ (kích thước {len(flat_comparison_matrix)} != {expected_size}), sử dụng ma trận được tạo")
+#                 flat_comparison_matrix = flatten_matrix(generated_matrix)
+#         else:
+#             logger.info("Không có comparison_matrix, sử dụng ma trận được tạo từ criterion_scores")
+#             flat_comparison_matrix = flatten_matrix(generated_matrix)
+        
+#         # Kiểm tra giá trị trong flat_comparison_matrix
+#         if not all(isinstance(val, (int, float)) and 0.111 <= val <= 9 for val in flat_comparison_matrix):
+#             raise HTTPException(status_code=400, detail="Giá trị ma trận phải từ 0.111 đến 9")
+
+#         # Tính trọng số
+#         weights = calculate_weights(flat_comparison_matrix)
+        
+#         # Tính final_score
+#         final_score = calculate_final_score(weights, data.criterion_scores, criteria_list)
+
+#         # Tính consistency_ratio (nếu cần)
+#         consistency_ratio = data.consistency_ratio or 0.0
+
+#         # Tạo tài liệu với trường email từ current_user
+#         document = {
+#             "alternative": data.alternative,
+#             "final_score": final_score,
+#             "criterion_scores": data.criterion_scores,
+#             "criteria_list": criteria_list,
+#             "criteria_comparison_matrix": flat_comparison_matrix,
+#             "consistency_ratio": consistency_ratio,
+#             "email": current_user.email,  
+#             "created_at": datetime.utcnow().isoformat(),
+#             "updated_at": None,
+#         }
+#         result = collection.insert_one(document)
+#         document["id"] = str(result.inserted_id)
+#         return TchiUserOutput(**document)
+#     except Exception as e:
+#         logger.error(f"Lỗi trong add_to_tchi_user: {str(e)}")
+#         raise HTTPException(status_code=500, detail=f"Lỗi khi lưu vào MongoDB: {str(e)}")
+#     finally:
+#         if client:
+#             client.close()
+# @router.post("/tchi_user", response_model=TchiUserOutput)
+# async def add_to_tchi_user(data: TchiUserInput, current_user: User = Depends(get_current_user)):
+#     collection = None
+#     client = None
+#     try:
+#         collection, client = get_tchi_user_collection()
+        
+#         # Lấy danh sách tiêu chí từ criteria_list hoặc criterion_scores
+#         criteria_list = data.criteria_list or list(data.criterion_scores.keys())
+#         if not criteria_list:
+#             raise HTTPException(status_code=400, detail="Danh sách tiêu chí không được rỗng.")
+        
+#         # Tính ma trận so sánh từ criterion_scores nếu không có comparison_matrix
+#         scores = list(data.criterion_scores.values())
+#         generated_matrix = calculate_comparison_matrix(scores)
+        
+#         # Xử lý comparison_matrix
+#         expected_size = len(criteria_list) * len(criteria_list)
+#         if data.comparison_matrix:
+#             flat_comparison_matrix = flatten_matrix(data.comparison_matrix)
+#             if len(flat_comparison_matrix) != expected_size:
+#                 logger.warning(f"Ma trận so sánh không hợp lệ (kích thước {len(flat_comparison_matrix)} != {expected_size}), sử dụng ma trận được tạo")
+#                 flat_comparison_matrix = flatten_matrix(generated_matrix)
+#         else:
+#             logger.info("Không có comparison_matrix, sử dụng ma trận được tạo từ criterion_scores")
+#             flat_comparison_matrix = flatten_matrix(generated_matrix)
+        
+#         # Kiểm tra giá trị trong flat_comparison_matrix
+#         if not all(isinstance(val, (int, float)) and 0.111 <= val <= 9 for val in flat_comparison_matrix):
+#             raise HTTPException(status_code=400, detail="Giá trị ma trận phải từ 0.111 đến 9")
+
+#         # Tính trọng số và lambda_max
+#         weights, lambda_max = calculate_weights(flat_comparison_matrix)
+        
+#         # Tính final_score
+#         final_score = calculate_final_score(weights, data.criterion_scores, criteria_list)
+
+#         # Tính consistency_ratio
+#         consistency_ratio = data.consistency_ratio or calculate_consistency_ratio(len(criteria_list), generated_matrix)
+
+#         # Tạo tài liệu
+#         document = {
+#             "alternative": data.alternative,
+#             "final_score": final_score,
+#             "criterion_scores": data.criterion_scores,
+#             "criteria_list": criteria_list,
+#             "criteria_comparison_matrix": flat_comparison_matrix,
+#             "consistency_ratio": consistency_ratio,
+#             "email": current_user.email,
+#             "created_at": datetime.utcnow().isoformat(),
+#             "updated_at": None,
+#             "lambda_max": lambda_max,  # Thêm lambda_max
+#             "priority_vector": weights,  # Thêm priority_vector
+#         }
+#         result = collection.insert_one(document)
+#         document["id"] = str(result.inserted_id)
+#         return TchiUserOutput(**document)
+#     except Exception as e:
+#         logger.error(f"Lỗi trong add_to_tchi_user: {str(e)}")
+#         raise HTTPException(status_code=500, detail=f"Lỗi khi lưu vào MongoDB: {str(e)}")
+#     finally:
+#         if client:
+#             client.close()
 @router.post("/tchi_user", response_model=TchiUserOutput)
-async def add_to_tchi_user(data: TchiUserInput):
+async def add_to_tchi_user(data: TchiUserInput, current_user: User = Depends(get_current_user)):
+    collection = None
+    client = None
     try:
-        # Kiểm tra gmail khớp với người dùng đăng nhập
         collection, client = get_tchi_user_collection()
         
-        # Lấy danh sách tiêu chí từ criterion_scores
-        criteria_list = list(data.criterion_scores.keys())
+        # Lấy danh sách tiêu chí từ criteria_list hoặc criterion_scores
+        criteria_list = data.criteria_list or list(data.criterion_scores.keys())
         if not criteria_list:
             raise HTTPException(status_code=400, detail="Danh sách tiêu chí không được rỗng.")
         
-        # Tính ma trận so sánh từ criterion_scores
+        # Tính ma trận so sánh từ criterion_scores nếu không có comparison_matrix
         scores = list(data.criterion_scores.values())
-        comparison_matrix = calculate_comparison_matrix(scores)
+        generated_matrix = calculate_comparison_matrix(scores)
         
-        # Chuyển ma trận 2D thành mảng phẳng
-        flat_comparison_matrix = flatten_matrix(data.comparison_matrix)
+        # Xử lý comparison_matrix
+        expected_size = len(criteria_list) * len(criteria_list)
+        if data.comparison_matrix:
+            flat_comparison_matrix = flatten_matrix(data.comparison_matrix)
+            if len(flat_comparison_matrix) != expected_size:
+                logger.warning(f"Ma trận so sánh không hợp lệ (kích thước {len(flat_comparison_matrix)} != {expected_size}), sử dụng ma trận được tạo")
+                flat_comparison_matrix = flatten_matrix(generated_matrix)
+        else:
+            logger.info("Không có comparison_matrix, sử dụng ma trận được tạo từ criterion_scores")
+            flat_comparison_matrix = flatten_matrix(generated_matrix)
         
-        # Tính trọng số từ ma trận
+        # Kiểm tra giá trị trong flat_comparison_matrix
+        if not all(isinstance(val, (int, float)) and 0.111 <= val <= 9 for val in flat_comparison_matrix):
+            raise HTTPException(status_code=400, detail="Giá trị ma trận phải từ 0.111 đến 9")
+
+        # Tính trọng số
         weights = calculate_weights(flat_comparison_matrix)
         
         # Tính final_score
         final_score = calculate_final_score(weights, data.criterion_scores, criteria_list)
 
+        # Tính consistency_ratio (nếu cần)
+        consistency_ratio = data.consistency_ratio or 0.0
+
+        # Tạo tài liệu với thêm trường email từ current_user
         document = {
             "alternative": data.alternative,
             "final_score": final_score,
             "criterion_scores": data.criterion_scores,
-            "criteria_list": criteria_list,  # Ensure included
+            "criteria_list": criteria_list,
             "criteria_comparison_matrix": flat_comparison_matrix,
-            "consistency_ratio": 0.00,  # Hardcoded as per TchiUserOutput
+            "consistency_ratio": consistency_ratio,
+            "email": current_user.email,  # Thêm trường email
             "created_at": datetime.utcnow().isoformat(),
             "updated_at": None,
-           
         }
         result = collection.insert_one(document)
         document["id"] = str(result.inserted_id)
-        client.close()
         return TchiUserOutput(**document)
     except Exception as e:
-        client.close()
         logger.error(f"Lỗi trong add_to_tchi_user: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Lỗi khi lưu vào MongoDB: {str(e)}")
-
+    finally:
+        if client:
+            client.close()
 # Endpoint GET /tchi_user
+
+
+
+
+# @router.get("", response_model=List[TchiUserOutput])
+# async def get_tchi_user():
+#     try:
+#         collection, client = get_tchi_user_collection()
+
+#         # Nếu không cần lọc theo gmail, chỉ lấy tất cả
+#         results = list(collection.find())
+#         client.close()
+
+#         if not results:
+#             return []
+
+#         formatted_results = []
+#         for result in results:
+#             result["id"] = str(result["_id"])
+#             del result["_id"]
+#             formatted_results.append(TchiUserOutput(**result))
+#         return formatted_results
+#     except Exception as e:
+#         client.close()
+#         logger.error(f"Lỗi trong get_tchi_user: {str(e)}")
+#         raise HTTPException(status_code=500, detail=f"Lỗi khi truy vấn MongoDB: {str(e)}")
+
+
+
+
 @router.get("", response_model=List[TchiUserOutput])
-async def get_tchi_user():
+async def get_tchi_user(current_user: User = Depends(get_current_user)):
     try:
         collection, client = get_tchi_user_collection()
-
-        # Nếu không cần lọc theo gmail, chỉ lấy tất cả
-        results = list(collection.find())
-        client.close()
-
+        results = list(collection.find({"email": current_user.email}))
         if not results:
+            logger.debug(f"No tchi_user found for email: {current_user.email}")
             return []
 
         formatted_results = []
@@ -172,10 +452,36 @@ async def get_tchi_user():
             formatted_results.append(TchiUserOutput(**result))
         return formatted_results
     except Exception as e:
-        client.close()
         logger.error(f"Lỗi trong get_tchi_user: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Lỗi khi truy vấn MongoDB: {str(e)}")
+    finally:
+        if client:
+            client.close()
+# @router.get("", response_model=List[TchiUserOutput])
+# async def get_tchi_user(current_user: User = Depends(get_current_user)):
+#     try:
+#         collection, client = get_tchi_user_collection()
+#         results = list(collection.find({"email": current_user.email}))
+#         if not results:
+#             logger.debug(f"Không tìm thấy tchi_user nào cho email: {current_user.email}")
+#             return []
 
+#         formatted_results = []
+#         for result in results:
+#             result["id"] = str(result["_id"])
+#             del result["_id"]
+#             result.setdefault("lambda_max", 0.0)  # Default if missing
+#             result.setdefault("priority_vector", [])  # Default if missing
+#             if isinstance(result.get("criteria_comparison_matrix"), list) and any(isinstance(x, list) for x in result["criteria_comparison_matrix"]):
+#                 result["criteria_comparison_matrix"] = [val for row in result["criteria_comparison_matrix"] for val in row]
+#             formatted_results.append(TchiUserOutput(**result))
+#         return formatted_results
+#     except Exception as e:
+#         logger.error(f"Lỗi trong get_tchi_user: {str(e)}")
+#         raise HTTPException(status_code=500, detail=f"Lỗi khi truy vấn MongoDB: {str(e)}")
+#     finally:
+#         if client:
+#             client.close()
 # Endpoint PUT /tchi_user/{id}
 @router.put("/{id}", response_model=TchiUserOutput)
 async def update_tchi_user(id: str, update_data: UpdateScoresInput):
@@ -241,24 +547,7 @@ async def update_tchi_user(id: str, update_data: UpdateScoresInput):
                     detail=f"Tiêu chí không khớp. Thiếu: {missing_criteria}, Thừa: {extra_criteria}"
                 )
             update_fields["criterion_scores"] = update_data.criterion_scores
-
-        # Tính final_score nếu có comparison_matrix hoặc criterion_scores mới
-        if "criteria_comparison_matrix" in update_fields or "criterion_scores" in update_fields:
-            # Lấy comparison_matrix và criterion_scores từ dữ liệu mới hoặc dữ liệu cũ
-            comparison_matrix = update_fields.get("criteria_comparison_matrix", document.get("criteria_comparison_matrix"))
-            criterion_scores = update_fields.get("criterion_scores", document.get("criterion_scores"))
-
-            if not comparison_matrix or not criterion_scores:
-                client.close()
-                raise HTTPException(status_code=400, detail="Thiếu comparison_matrix hoặc criterion_scores để tính final_score.")
-
-            # Tính trọng số
-            weights = calculate_weights(comparison_matrix)
-
-            # Tính final_score
-            final_score = calculate_final_score(weights, criterion_scores, criteria_list)
-            update_fields["final_score"] = final_score
-            logger.info(f"Calculated final_score: {final_score}")
+            logger.info(f"Updating criterion_scores: {update_data.criterion_scores}")
 
         if not update_fields:
             client.close()
@@ -310,3 +599,126 @@ async def delete_tchi_user(id: str):
         client.close()
         logger.error(f"Lỗi trong delete_tchi_user: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Lỗi khi xóa dữ liệu từ MongoDB: {str(e)}")
+
+def calculate_consistency_ratio(size: int, matrix: List[List[float]]) -> float:
+    try:
+        if size * size != len([val for row in matrix for val in row]):
+            raise ValueError("Ma trận không hợp lệ, kích thước không khớp.")
+
+        flat_matrix = [val for row in matrix for val in row]
+        matrix_array = np.array(flat_matrix).reshape(size, size)
+
+        # Tính eigenvalue lớn nhất (λ_max)
+        eigenvalues = np.linalg.eigvals(matrix_array)
+        lambda_max = np.max(np.real(eigenvalues))
+
+        # Tính Consistency Index (CI)
+        if size == 1:
+            return 0.0
+        ci = (lambda_max - size) / (size - 1)
+
+        # Random Index (RI) dựa trên kích thước ma trận
+        ri_values = {1: 0.00, 2: 0.00, 3: 0.58, 4: 0.90, 5: 1.12, 6: 1.24, 7: 1.32, 8: 1.41, 9: 1.45, 10: 1.49}
+        ri = ri_values.get(size, 1.51)  # Giá trị mặc định cho n > 10
+
+        # Tính Consistency Ratio (CR)
+        cr = ci / ri if ri > 0 else 0.0
+        return round(cr, 4)
+    except Exception as e:
+        logger.error(f"Lỗi tính Consistency Ratio: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Error calculating consistency ratio: {str(e)}")
+
+@router.post("/tchi_user/excel", response_model=List[TchiUserOutput])
+async def add_tchi_user_from_excel(file: UploadFile = File(...)):
+    collection = None
+    client = None
+    try:
+        # Đọc file Excel
+        contents = await file.read()
+        excel_file = io.BytesIO(contents)
+        df = pd.read_excel(excel_file)
+
+        # Lấy danh sách tiêu chí từ tiêu đề cột
+        criteria_list = list(df.columns)
+        size = len(criteria_list)
+
+        # Kiểm tra số lượng tiêu chí (phải >= 5)
+        if size < 5:
+            raise HTTPException(status_code=400, detail=f"Số lượng tiêu chí ({size}) nhỏ hơn 5, không hợp lệ.")
+
+        # Kiểm tra số hàng (phải khớp với số cột để tạo ma trận vuông)
+        if len(df) != size:
+            raise HTTPException(status_code=400, detail=f"Ma trận phải là vuông ({size}x{size}), nhưng nhận được {len(df)} hàng và {size} cột.")
+
+        # Khởi tạo kết nối MongoDB
+        collection, client = get_tchi_user_collection()
+        results = []
+
+        # Lấy ma trận từ file Excel
+        try:
+            matrix = df[criteria_list].values.tolist()
+            # Chuyển đổi tất cả giá trị thành float và kiểm tra phạm vi
+            for i in range(size):
+                for j in range(size):
+                    value = matrix[i][j]
+                    if not isinstance(value, (int, float)):
+                        raise ValueError(f"Dòng {i + 1}, cột {criteria_list[j]}: Giá trị phải là số.")
+                    if value < 1/9 or value > 9:
+                        raise ValueError(f"Dòng {i + 1}, cột {criteria_list[j]}: Giá trị phải từ 0.111 đến 9.")
+                    matrix[i][j] = float(value)
+
+            # Tính Consistency Ratio (CR)
+            consistency_ratio = calculate_consistency_ratio(size, matrix)
+            if consistency_ratio < 0.1:
+                logger.warning(f"Ma trận có CR ({consistency_ratio:.2f}) < 0.1, không hợp lệ, bỏ qua.")
+                raise HTTPException(status_code=400, detail=f"Ma trận có CR ({consistency_ratio:.2f}) < 0.1, không hợp lệ.")
+
+            # Chuẩn bị document
+            document = {
+                "criteria_list": criteria_list,
+                "criteria_scores": {criteria: 1.0 for criteria in criteria_list},  # Mặc định tất cả tiêu chí có trọng số 1.0
+                "final_score": 0.0,  # Mặc định
+                "alternative": file.filename,
+                "criteria_comparison_matrix": [val for row in matrix for val in row],
+                "consistency_ratio": consistency_ratio,
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": None,
+            }
+
+            # Lưu vào MongoDB
+            result = collection.insert_one(document)
+            document["id"] = str(result.inserted_id)
+            results.append(TchiUserOutput(**document))
+
+        except Exception as e:
+            logger.error(f"Lỗi xử lý ma trận trong file Excel: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"Lỗi xử lý ma trận: {str(e)}")
+
+        if not results:
+            raise HTTPException(status_code=400, detail="Không có dữ liệu nào được xử lý thành công từ file Excel hoặc ma trận có CR < 0.1.")
+        return results
+
+    except Exception as e:
+        if client:
+            client.close()
+        logger.error(f"Lỗi trong add_tchi_user_from_excel: {str(e)}")
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=500, detail=f"Lỗi khi xử lý file Excel: {str(e)}")
+    finally:
+        if client:
+            client.close()
+
+@router.post("/tchi_user/export_pdf")
+async def export_tchi_user_pdf(data: TchiUserInput):
+    try:
+        pdf_path = f"{data.alternative}_results.pdf"
+        c = canvas.Canvas(pdf_path, pagesize=letter)
+        c.drawString(100, 750, f"Alternative: {data.alternative}")
+        c.drawString(100, 730, f"Citerion List: {data.criteria_list}")
+        c.drawString(100, 730, f"Citerion Matrix: {data.comparison_matrix}")
+        c.drawString(100, 730, f"CR: {data.consistency_ratio:.2f}")
+        c.save()
+        return FileResponse(pdf_path, media_type='application/pdf', filename=pdf_path)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")

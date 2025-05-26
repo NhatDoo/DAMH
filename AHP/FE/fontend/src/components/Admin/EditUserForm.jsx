@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 const EditUserForm = ({ user, onUpdate, onCancel }) => {
   const [updatedUser, setUpdatedUser] = useState({
     id: user.id,
-    name: user.name || '',
     email: user.email,
     password: user.password || '', // Mật khẩu có thể để trống nếu không muốn cập nhật
     role: user.role || 'User',
@@ -16,8 +15,8 @@ const EditUserForm = ({ user, onUpdate, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!updatedUser.name || !updatedUser.email) {
-      alert('Vui lòng điền đầy đủ thông tin.');
+    if (!updatedUser.email) {
+      alert('Vui lòng điền email.');
       return;
     }
     onUpdate(updatedUser);
@@ -27,16 +26,6 @@ const EditUserForm = ({ user, onUpdate, onCancel }) => {
     <div className="edit-user-form" style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '4px', marginBottom: '20px' }}>
       <h3>Chỉnh sửa người dùng</h3>
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Tên: </label>
-          <input
-            type="text"
-            name="name"
-            value={updatedUser.name}
-            onChange={handleChange}
-            style={{ padding: '5px', width: '200px', marginLeft: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
-          />
-        </div>
         <div style={{ marginBottom: '10px' }}>
           <label>Email: </label>
           <input

@@ -8,9 +8,9 @@ from typing import List, Dict, Optional
 class AHPResult(BaseModel):
     id: Optional[str] = None
     alternatives_list: List[str]
-    final_scores: List[float]
+    # final_scores: List[float]
     ranked_alternatives: List[RankedAlternative]
-    alternative_scores: Dict[str, List[float]]
+    # alternative_scores: Dict[str, List[float]]
     criteria_comparison_matrices: Optional[Dict[str, List[List[float]]]] = None
     consistency_ratios: Optional[Dict[str, float]] = None
     metadata: Dict

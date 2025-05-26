@@ -15,10 +15,7 @@ const AddUserForm = ({ onAdd, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!newUser.name || !newUser.email || !newUser.password) {
-      alert('Vui lòng điền đầy đủ thông tin.');
-      return;
-    }
+    
     onAdd(newUser);
   };
 
@@ -26,16 +23,6 @@ const AddUserForm = ({ onAdd, onCancel }) => {
     <div className="add-user-form" style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '4px', marginBottom: '20px' }}>
       <h3>Thêm người dùng mới</h3>
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Tên: </label>
-          <input
-            type="text"
-            name="name"
-            value={newUser.name}
-            onChange={handleChange}
-            style={{ padding: '5px', width: '200px', marginLeft: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
-          />
-        </div>
         <div style={{ marginBottom: '10px' }}>
           <label>Email: </label>
           <input

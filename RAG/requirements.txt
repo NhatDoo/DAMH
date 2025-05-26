@@ -1,0 +1,8 @@
+fastapi
+pydantic
+neo4j
+sentence-transformers
+numpy
+torch
+faiss-cpu
+langchain-ollama
