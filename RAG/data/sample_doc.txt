@@ -1,26 +1,26 @@
-Tiêu chí 'Nguồn Vốn' so với 'Khu vực' có giá trị so sánh 2.0.
-Tiêu chí 'Nguồn Vốn' so với 'Rủi ro' có giá trị so sánh 2.0.
+Tiêu chí 'Nguồn Vốn' so với 'Khu vực' có giá trị so sánh 1.0.
+Tiêu chí 'Nguồn Vốn' so với 'Rủi ro' có giá trị so sánh 1.0.
 Tiêu chí 'Nguồn Vốn' so với 'Xu hướng thị trường' có giá trị so sánh 1.0.
-Tiêu chí 'Nguồn Vốn' so với 'Thời gian' có giá trị so sánh 0.25.
+Tiêu chí 'Nguồn Vốn' so với 'Thời gian' có giá trị so sánh 1.0.
 Tiêu chí 'Nguồn Vốn' so với 'Mạng lưới quan hệ' có giá trị so sánh 1.0.
-Tiêu chí 'Nguồn Vốn' so với 'Kỹ năng' có giá trị so sánh 0.5.
-Tiêu chí 'Kỹ năng' so với 'Khu vực' có giá trị so sánh 0.33.
+Tiêu chí 'Nguồn Vốn' so với 'Kỹ năng' có giá trị so sánh 1.0.
+Tiêu chí 'Kỹ năng' so với 'Khu vực' có giá trị so sánh 1.0.
 Tiêu chí 'Kỹ năng' so với 'Rủi ro' có giá trị so sánh 1.0.
 Tiêu chí 'Kỹ năng' so với 'Xu hướng thị trường' có giá trị so sánh 1.0.
-Tiêu chí 'Kỹ năng' so với 'Thời gian' có giá trị so sánh 0.86.
-Tiêu chí 'Kỹ năng' so với 'Mạng lưới quan hệ' có giá trị so sánh 0.5.
+Tiêu chí 'Kỹ năng' so với 'Thời gian' có giá trị so sánh 2.0.
+Tiêu chí 'Kỹ năng' so với 'Mạng lưới quan hệ' có giá trị so sánh 2.0.
 Tiêu chí 'Mạng lưới quan hệ' so với 'Khu vực' có giá trị so sánh 1.0.
-Tiêu chí 'Mạng lưới quan hệ' so với 'Rủi ro' có giá trị so sánh 1.0.
-Tiêu chí 'Mạng lưới quan hệ' so với 'Xu hướng thị trường' có giá trị so sánh 0.8.
+Tiêu chí 'Mạng lưới quan hệ' so với 'Rủi ro' có giá trị so sánh 4.0.
+Tiêu chí 'Mạng lưới quan hệ' so với 'Xu hướng thị trường' có giá trị so sánh 1.0.
 Tiêu chí 'Mạng lưới quan hệ' so với 'Thời gian' có giá trị so sánh 1.0.
-Tiêu chí 'Thời gian' so với 'Khu vực' có giá trị so sánh 1.0.
 Tiêu chí 'Thời gian' so với 'Rủi ro' có giá trị so sánh 1.0.
 Tiêu chí 'Thời gian' so với 'Xu hướng thị trường' có giá trị so sánh 1.0.
+Tiêu chí 'Thời gian' so với 'Khu vực' có giá trị so sánh 1.0.
 Tiêu chí 'Xu hướng thị trường' so với 'Rủi ro' có giá trị so sánh 1.0.
 Tiêu chí 'Xu hướng thị trường' so với 'Khu vực' có giá trị so sánh 1.0.
 Tiêu chí 'Rủi ro' so với 'Khu vực' có giá trị so sánh 1.0.
-Phương án 'Đầu tư phát triển nhân lực' có thứ hạng 1.0 với điểm số 0.21458864011217493.
-Phương án 'Đầu tư tiếp thị' có thứ hạng 2.0 với điểm số 0.21060600168664806.
-Phương án 'Đầu tư gọi vốn' có thứ hạng 3.0 với điểm số 0.19880521888220798.
-Phương án 'Đầu tư cơ sở hạ tầng' có thứ hạng 4.0 với điểm số 0.1950050884588116.
-Phương án 'Đầu tư mở rộng chi nhánh' có thứ hạng 5.0 với điểm số 0.18099505086015727.
+Phương án 'Phương án đầu tư gọi vốn' có thứ hạng 1.0 với điểm số 0.20777388645596773.
+Phương án 'Phương án đầu tư cơ sở hạ tầng' có thứ hạng 2.0 với điểm số 0.20568114106637952.
+Phương án 'Phương án đầu tư mở rộng chi nhánh' có thứ hạng 3.0 với điểm số 0.20288771971023856.
+Phương án 'Phương án đầu tư tập huấn nhân viên' có thứ hạng 4.0 với điểm số 0.19231895928154352.
+Phương án 'Phương án đầu tư tiếp thị' có thứ hạng 5.0 với điểm số 0.19133829348587061.
